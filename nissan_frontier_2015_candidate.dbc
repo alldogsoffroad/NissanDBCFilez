@@ -79,6 +79,12 @@ BO_ 1408 ENGINE_6: 8 XXX
  SG_ RPM_COARSE : 7|16@0+ (1.5,0) [0|98302.5] "rpm" XXX
  SG_ OIL_TEMP : 32|8@1+ (1,-40) [-40|215] "degC" XXX
 
+BO_ 375 SHIFT_TORQUE_REQ: 8 XXX
+ SG_ TORQUE_REDUCE_REQ : 32|8@1+ (1,0) [0|255] "" XXX
+
+BO_ 386 ENGINE_TORQUE: 8 XXX
+ SG_ ENGINE_TORQUE : 32|8@1+ (1,0) [0|255] "" XXX
+
 BO_ 1057 GEARBOX: 3 XXX
  SG_ GEAR_SELECTOR : 0|8@1+ (1,0) [0|32] "" XXX
 
@@ -93,6 +99,8 @@ CM_ SG_ 352 THROTTLE_POSITION "CONFIRMED (discovery, not in Xterra DBC): 0x160 b
 CM_ SG_ 352 THROTTLE_POSITION_INV "Redundant TPS track: raw byte5 = 255 - byte3. Should read same % as THROTTLE_POSITION (dual-track sensor validation). Accel PEDAL candidate also at 0x160 byte4 (idle ~8, reaches 200).";
 CM_ SG_ 1361 COOLANT_TEMP "HIGH CONFIDENCE: read ~46-47 degC at idle in the baseline capture.";
 CM_ SG_ 1057 GEAR_SELECTOR "CONFIRMED (discovery): 0x421 byte0. P=0x08 (baseline/park), R=0x10, N=0x18, D=0x20 (+8 each); 0x00 flickers between detents.";
+CM_ SG_ 375 TORQUE_REDUCE_REQ "CANDIDATE (2 upshifts): 0x177 byte4 = 0 except a ~150ms pulse centered on each upshift; magnitude tracks shift firmness (0x9A hard, 0x4D light). Likely the TCU->ECM torque-reduction request. Scale raw pending more events.";
+CM_ SG_ 386 ENGINE_TORQUE "CANDIDATE (2 upshifts): 0x182 byte4 = engine torque/load. Pegged 0xFF under hard load, dips ~50% exactly as RPM falls during the shift; rose with throttle earlier. The ECM side of the shift torque handshake. Scale raw pending.";
 
 VAL_ 1057 GEAR_SELECTOR 8 "P" 16 "R" 24 "N" 32 "D" 0 "SHIFTING" ;
 CM_ SG_ 640 SPEED "CONFIRMED on-vehicle: big-endian bytes4-5, unit is 0.01 MPH (peak raw 1091 = 10.9 mph vs driver-reported ~11 mph). Note: this is mph, while the ABS wheels below are km/h.";
