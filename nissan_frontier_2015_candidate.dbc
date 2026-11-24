@@ -33,7 +33,7 @@ NS_ :
 
 BS_:
 
-BU_ XXX
+BU_: XXX ECM TCM
 
 
 BO_ 2 STEERING: 5 XXX
@@ -41,14 +41,20 @@ BO_ 2 STEERING: 5 XXX
  SG_ POWER_STEER_RATE : 23|8@0+ (1,0) [0|255] "" XXX
  SG_ COUNTER : 35|4@0+ (1,0) [0|15] "" XXX
 
-BO_ 352 THROTTLE: 7 XXX
+BO_ 352 THROTTLE: 7 ECM
  SG_ THROTTLE_POSITION : 24|8@1+ (0.392,0) [0|100] "%" XXX
  SG_ THROTTLE_POSITION_INV : 40|8@1+ (-0.392,99.96) [0|100] "%" XXX
+ SG_ TORQUE_DEMAND : 7|12@0+ (0.5,-400) [-400|1647.5] "Nm" TCM
+ SG_ TORQUE_ACTUAL_2 : 11|12@0+ (0.5,-400) [-400|1647.5] "Nm" TCM
 
-BO_ 384 ENGINE_RPM_ALT: 8 XXX
+BO_ 384 ENGINE_RPM_ALT: 8 ECM
  SG_ RPM : 7|16@0+ (0.125,0) [0|8191.875] "rpm" XXX
+ SG_ TORQUE_ACTUAL : 23|12@0+ (0.5,-400) [-400|1647.5] "Nm" TCM
+ SG_ TORQUE_DEMAND : 27|12@0+ (0.5,-400) [-400|1647.5] "Nm" TCM
+ SG_ PEDAL_10BIT : 47|10@0+ (0.098,0) [0|100.254] "%" TCM
+ SG_ COUNTER : 51|4@0+ (1,0) [0|15] "" TCM
 
-BO_ 505 ENGINE_1: 8 XXX
+BO_ 505 ENGINE_1: 8 ECM
  SG_ RPM : 23|16@0+ (0.125,0) [0|8191.875] "rpm" XXX
  SG_ FAN_REQ : 6|2@1+ (1,0) [0|3] "" XXX
  SG_ AC_REQ : 3|1@1+ (1,0) [0|1] "" XXX
@@ -72,18 +78,42 @@ BO_ 852 SPEED_BRAKE: 8 XXX
 BO_ 861 BCM: 8 XXX
  SG_ BRAKE_SWITCH : 36|1@1+ (1,0) [0|1] "" XXX
 
-BO_ 1361 ENGINE_5: 8 XXX
+BO_ 1361 ENGINE_5: 8 ECM
  SG_ COOLANT_TEMP : 0|8@1+ (1,-45) [-45|210] "degC" XXX
 
-BO_ 1408 ENGINE_6: 8 XXX
+BO_ 1408 ENGINE_6: 8 ECM
  SG_ RPM_COARSE : 7|16@0+ (1.5,0) [0|98302.5] "rpm" XXX
  SG_ OIL_TEMP : 32|8@1+ (1,-40) [-40|215] "degC" XXX
 
-BO_ 375 SHIFT_TORQUE_REQ: 8 XXX
- SG_ TORQUE_REDUCE_REQ : 32|8@1+ (1,0) [0|255] "" XXX
+BO_ 375 SHIFT_TORQUE_REQ: 6 TCM
+ SG_ GEAR_INDEX : 18|3@0+ (1,0) [0|7] "" ECM
+ SG_ STATUS_B2_BIT3 : 19|1@0+ (1,0) [0|1] "" ECM
+ SG_ FIRST_GEAR : 24|1@0+ (1,0) [0|1] "" ECM
+ SG_ TORQUE_REDUCE_REQ : 32|8@1+ (1,0) [0|255] "" ECM
+ SG_ SHIFT_TYPE : 46|4@0+ (1,0) [0|15] "" ECM
 
-BO_ 386 ENGINE_TORQUE: 8 XXX
+BO_ 386 ENGINE_TORQUE: 8 ECM
  SG_ ENGINE_TORQUE : 32|8@1+ (1,0) [0|255] "" XXX
+ SG_ COUNTER : 43|4@0+ (1,0) [0|15] "" TCM
+
+BO_ 372 TCM_GEAR: 8 TCM
+ SG_ TQ_FIELD_A : 7|12@0+ (0.5,-400) [-400|1647.5] "Nm" ECM
+ SG_ TQ_FIELD_B : 11|12@0+ (0.5,-400) [-400|1647.5] "Nm" ECM
+ SG_ GEAR_TARGET : 31|4@0+ (1,0) [0|15] "" ECM
+ SG_ GEAR_ENGAGED : 27|4@0+ (1,0) [0|15] "" ECM
+ SG_ MODE : 39|3@0+ (1,0) [0|7] "" ECM
+ SG_ COUNTER : 35|4@0+ (1,0) [0|15] "" ECM
+ SG_ STATUS_B5_BIT7 : 47|1@0+ (1,0) [0|1] "" ECM
+
+BO_ 374 TCM_SPEEDS: 7 TCM
+ SG_ OUTPUT_SPEED : 7|16@0+ (1,0) [0|65535] "rpm" ECM
+ SG_ TURBINE_SPEED : 23|16@0+ (1,0) [0|65535] "rpm" ECM
+ SG_ COUNTER : 51|4@0+ (1,0) [0|15] "" ECM
+
+BO_ 1376 TCM_STATUS_MUX: 4 TCM
+ SG_ STATUS_B0 : 7|8@0+ (1,0) [0|255] "" ECM
+ SG_ PAGE : 15|8@0+ (1,0) [0|255] "" ECM
+ SG_ PAGE_DATA : 23|8@0+ (1,0) [0|255] "" ECM
 
 BO_ 1057 GEARBOX: 3 XXX
  SG_ GEAR_SELECTOR : 0|8@1+ (1,0) [0|32] "" XXX
@@ -92,13 +122,17 @@ BO_ 1477 MILEAGE: 8 XXX
 
 
 
+
+BA_DEF_ BO_ "GenMsgCycleTime" INT 0 65535;
+BA_DEF_DEF_ "GenMsgCycleTime" 0;
+
 CM_ SG_ 505 RPM "CONFIRMED on-vehicle: big-endian (Motorola), 0.125 rpm/bit. Idle raw ~5650 = ~706 rpm. NOTE: Xterra DBC had this little-endian, which is WRONG for the Frontier.";
 CM_ SG_ 384 RPM "CONFIRMED: same RPM value mirrored here in bytes 0-1, big-endian.";
 CM_ SG_ 2 STEERING_ANGLE "CONFIRMED on-vehicle: little-endian signed, 0.1 deg/bit, offset 0. Reads ~0 centered; swept -613..+611 deg. (Endianness is per-signal here: RPM is big-endian, this is little-endian.)";
 CM_ SG_ 352 THROTTLE_POSITION "CONFIRMED (discovery, not in Xterra DBC): 0x160 byte3, 0 at idle (throttle closed), rises with pedal blips and leads RPM. Scale 0.392 assumed (0-255=0-100%); refine at wide-open throttle.";
 CM_ SG_ 352 THROTTLE_POSITION_INV "Redundant TPS track: raw byte5 = 255 - byte3. Should read same % as THROTTLE_POSITION (dual-track sensor validation). Accel PEDAL candidate also at 0x160 byte4 (idle ~8, reaches 200).";
 CM_ SG_ 1361 COOLANT_TEMP "HIGH CONFIDENCE: read ~46-47 degC at idle in the baseline capture.";
-CM_ SG_ 1057 GEAR_SELECTOR "CONFIRMED (discovery): 0x421 byte0. P=0x08 (baseline/park), R=0x10, N=0x18, D=0x20 (+8 each); 0x00 flickers between detents.";
+CM_ SG_ 1057 GEAR_SELECTOR "CONFIRMED (discovery): 0x421 byte0. P=0x08 (baseline/park), R=0x10, N=0x18, D=0x20 (+8 each); 0x00 flickers between detents. 2026-11-23: 60 ms (LOGS); NOT in the ECM receive table (ROM); sender still open (shifter or TCM).";
 CM_ SG_ 375 TORQUE_REDUCE_REQ "CONFIRMED (9 upshifts, 2026-09-11): 0x177 byte4 = TCU->ECM torque-reduction request; 0 except a ~150ms pulse at each upshift. Magnitude scales with ENGINE RPM AT THE SHIFT (rpm_pre), r=0.964 (throttle r=0.51, weaker). Range 0x0D@~1950rpm .. 0xCD@~5800rpm. GEAR-DEPENDENT (confirmed 2026-09-11 via gear inference in shift_analyze.py 3b): the request is NOT one global line -- it splits by gear-pair. G1->G2: req = 0.0442*rpm - 49.6 (r=0.997, steep). The global fit is an artifact of mixing shift types (r collapses 0.96->0.53 as gear variety is added). The 8HP70 gateway needs a PER-GEAR-PAIR map. G1->G2 LOCKED (reproduced over 2 sessions, n=6+3): req = 0.0447*rpm - 58.3 (r=0.950). G2->G3 rises more gently but scattered (n=10): ~0.019*rpm + 67 (r=0.82). G3->G4 (n=5) all req=0x4D(77) but over a narrow RPM band 3040-3500 -> flat-vs-sloped UNRESOLVED. G4->G5 still not cleanly isolated. Gear ladder rpm/mph: G1=107 G2=68 G3=44 G4=28 (G5~22). STEPPED-MAP MODEL (shift_analyze.py 3c, better than linear -- request is a quantized TCU calibration table, not a line). Observed levels (gear x RPM -> 0x177 b4), from 64 combined events (2026-09-11_torque_ALL_combined.txt): G1->G2 DONE (n=13): 0x33 @2281-2662 (step ~2809), 0x4D @2956, 0x66 @3306-3647, 0xCD @5806 (big jump up high). G2->G3 DONE (n=13): 0x53 @2130-2280, 0x80 @2420, 0x9A @3125-4831, 0xA0 @5362, 0xA7 @5806-5850. Level quantization set: {33,4D,53,66,80,9A,A0,A7,CD}. FULL MAP COMPLETE (64 events, shift_analyze.py --gears 106,68,44,28,22 imposing the clean ladder from the steady D-run, which unblocked the coasting-blurred higher gears): G1->G2: 0x33 <~2810, 0x4D ~2810-3130, 0x66 ~3130-4726, 0xCD @5800. G2->G3: 0x53 <~2350, 0x80 ~2350-2820, 0x9A ~2820-5100, 0xA0 ~5100-5580, 0xA7 >~5580. G3->G4: 0x33 <~2870, 0x4D ~2870-3645, 0x66 >~3645 (the earlier 'constant 77' was just the middle step). G4->G5: 0x00 (no reduction) at low rpm, 0x0D, 0x1A, 0x33, 0x40 >~2846. KEY PATTERN: request scales DOWN in higher gears (G4->G5 max 0x40 vs G1->G2 0xCD) -- less inertia to manage. This is the LOOKUP TABLE the 8HP70 gateway must reproduce. Remaining: confirm single-obs levels + one overlap in G4->G5 boundary.";
 CM_ SG_ 386 ENGINE_TORQUE "CANDIDATE (2 upshifts): 0x182 byte4 = engine torque/load. Pegged 0xFF under hard load, dips ~50% exactly as RPM falls during the shift; rose with throttle earlier. The ECM side of the shift torque handshake. Scale raw pending.";
 
@@ -107,3 +141,52 @@ CM_ SG_ 640 SPEED "CONFIRMED on-vehicle: big-endian bytes4-5, unit is 0.01 MPH (
 CM_ SG_ 644 WHEEL_1 "CONFIRMED: 0x284/0x285 all four wheels big-endian, 0.01 km/h (peak raw 1858 = 18.6 km/h = 11.5 mph, matches ~11 mph). All four agree straight, split slightly in turns.";
 CM_ SG_ 852 BRAKE_LIGHT "CONFIRMED on-vehicle: byte6 toggles 0x04<->0x14 (bit 52) on brake press.";
 CM_ SG_ 861 BRAKE_SWITCH "CONFIRMED: BCM byte4 bit4 toggles 0x00<->0x10 on brake press (was an undecoded message). Candidate brake flags also at 0x180 b7 bit0 and 0x182 b6 bit6.";
+
+CM_ "2026-11-23 additions (sender/receiver nodes, 0x174/0x176/0x560, 0x177 fields, the 0x180/0x160/0x182 torque, pedal and counter signals, cycle times) come from three sources, named in each comment: LOGS = the 2026-09-1x truck logs (2015 Frontier, TCM connected, 64 shift windows, ~117k frames); ROM = a full 1 MB dump of a bench ECM (Hitachi DH1, 23710-9CF0A, software 9CJ3A, SH7058) and its decoded CAN table / handlers; BENCH = frames replayed into that ECM (receive ages and DTCs read back over CAN 0x7E0/0x7E8). Torque fields use the ECM's encoding raw x 5 - 4000 = 0.1 Nm, i.e. 0.5 Nm/bit offset -400 Nm; raw 0xFFF = invalid (ROM). Node ECM = engine control module, TCM = transmission controller (or the replacement TCU).";
+CM_ BO_ 372 "CONFIRMED sender TCM (ROM: in the ECM receive table; LOGS: 10 ms, DLC 8). Losing 0x174, 0x176 or 0x177 for ~1-2 s sets U1001 in the ECM (ROM: receive age > 199 passes). BENCH: replaying it keeps the ECM's receive age at 0.";
+CM_ SG_ 372 TQ_FIELD_A "LOGS: constant FF E7 1C in bytes 0-2 on the truck (field A raw 0xFFE). ROM: stored by the ECM, no reader found.";
+CM_ SG_ 372 TQ_FIELD_B "LOGS: constant raw 0x71C. ROM: stored by the ECM, no reader found.";
+CM_ SG_ 372 GEAR_TARGET "CONFIRMED (LOGS): target gear, high nibble of byte 3. Steady acceleration shows 0x21, 0x32, 0x43, 0x54 (target = engaged + 1); equal nibbles = no shift pending; 0x34 / 0x45 = downshift targets. At a 3-4 upshift: 0x43 -> 0x44 (4th engaged) -> 0x54. ROM: other codes (9, 10, 0, 11, 15) are special, 9 probably R, 10/0 P/N (inferred).";
+CM_ SG_ 372 GEAR_ENGAGED "CONFIRMED (LOGS): engaged gear, low nibble of byte 3. ROM: the ECM stores both nibbles (gear - 1) and uses them in ~17 places incl. gear-ratio speed logic; BENCH: 0x43 reads back as 02/03 in the ECM.";
+CM_ SG_ 372 MODE "ROM: mode code 0-7 (3, 5, 6, 7 set ECM flags). LOGS: always 0.";
+CM_ SG_ 372 COUNTER "CONFIRMED (LOGS): 4-bit rolling counter, +1 per frame (>= 99 % of steps). ROM: no fault found for a wrong counter.";
+CM_ SG_ 372 STATUS_B5_BIT7 "CANDIDATE (LOGS): set mostly in 3rd gear and above, together with 0x177 STATUS_B2_BIT3; not explained by converter slip. ROM: byte 5 bits 7:6 = 01 or 10 set an ECM flag.";
+CM_ BO_ 374 "CONFIRMED sender TCM (ROM receive table; LOGS 10 ms, DLC 7).";
+CM_ SG_ 374 OUTPUT_SPEED "HIGH CONFIDENCE (LOGS): output-shaft speed. TURBINE_SPEED / OUTPUT_SPEED per gear = 3.36 / 2.24 / 1.50 / 1.00 / 0.84 (RE5R05A ratios 3.83 / 2.37 / 1.52 / 1.00 / 0.83); ~25.8 counts per mph on that truck. Unit 1 rpm/bit inferred. ROM: the ECM can use it as its vehicle-speed source (calibration-selected).";
+CM_ SG_ 374 TURBINE_SPEED "HIGH CONFIDENCE (LOGS): turbine speed, ~0.91 x engine rpm (converter slip). Unit 1 rpm/bit inferred.";
+CM_ SG_ 374 COUNTER "CONFIRMED (LOGS): 4-bit rolling counter in byte 6, +1 per frame.";
+CM_ BO_ 375 "CONFIRMED sender TCM. LOGS: DLC 6 on the truck, 10 ms (the bench ECM's receive table copies 8 bytes; receive mailboxes accept either).";
+CM_ SG_ 375 GEAR_INDEX "CANDIDATE (LOGS): tracks engaged gear - 1 (sometimes the next gear during a shift). ROM: byte 2 bits 6 and 3 set ECM status flags.";
+CM_ SG_ 375 STATUS_B2_BIT3 "CANDIDATE (LOGS): set mostly in 3rd gear and above; meaning open.";
+CM_ SG_ 375 FIRST_GEAR "CONFIRMED pattern (LOGS): byte 3 = 1 only while in 1st gear. ROM: byte 3 bits 3:0 are compared with 8, 9, 10, 14 in the ECM.";
+CM_ SG_ 375 SHIFT_TYPE "CONFIRMED (LOGS, matches ROM): byte 5 bits 6:3. 0 = 1-2, 1 = 2-3, 2 = 3-4, 3 = 4-5, 9 = 4-3, 13 = 5-4, 15 = no shift. ROM: a cross-check against 0x174 (P1780) exists but is calibrated off.";
+CM_ BO_ 1376 "CONFIRMED sender TCM. ROM: the ECM's U0101 (lost communication with TCM, DTC index 0x118) is set when 0x560 (or 0x251) times out (code 0x9CAFC). BENCH: U0101 stayed current with 0x174/0x176/0x177 alone and cleared once 0x560 was also sent. LOGS: DLC 4, 100 ms.";
+CM_ SG_ 1376 STATUS_B0 "CANDIDATE (LOGS): drifts slowly 0x61-0x76 over a drive; possibly ATF temperature (raw - 40 degC would give ~75 degC), unconfirmed.";
+CM_ SG_ 1376 PAGE "CONFIRMED (LOGS): multiplexer, cycles 12 pages 0x10-0x17 and 0x40-0x43, one per frame.";
+CM_ SG_ 1376 PAGE_DATA "CANDIDATE (LOGS): data for PAGE, meaning unknown. Logged pages: 15:36 16:C2 17:C0 40:00 41:00 42:00 43:00 10:52 11:48 12:32 13:32 14:33.";
+CM_ SG_ 384 TORQUE_ACTUAL "CONFIRMED (LOGS + ROM encoding): actual engine torque, -67..+331 Nm logged. Drops during a 0x177 TORQUE_REDUCE_REQ cut (e.g. 283 -> 179 Nm within ~50 ms at a 1-2 shift) while TORQUE_DEMAND stays.";
+CM_ SG_ 384 TORQUE_DEMAND "HIGH CONFIDENCE (LOGS): driver-demand / pre-intervention torque, -24..+353.5 Nm logged; unchanged during a torque cut. Same value as 0x160 TORQUE_DEMAND.";
+CM_ SG_ 384 PEDAL_10BIT "CONFIRMED (LOGS): 10-bit, 0.098 %/bit, the same quantity as the 10-bit value in 0x160 bytes 3:4 but NOT byte-identical frame by frame: it best matches 0x160 two frames (~20 ms) earlier and is likely filtered. 0x160 (with its complement check) is the fresher source. 78.4 % at the logged full-throttle pulls. Accelerator pedal vs throttle blade not settled.";
+CM_ SG_ 384 COUNTER "CONFIRMED (LOGS + ROM): 4-bit rolling counter, the same counter as 0x182 COUNTER.";
+CM_ SG_ 386 COUNTER "CONFIRMED (LOGS + ROM): 4-bit rolling counter in byte 5, shared with 0x180 COUNTER.";
+CM_ BO_ 352 "2026-11-23 (LOGS): THROTTLE_POSITION is the top 8 bits of a 10-bit value at bytes 3:4[7:6] (0.098 %/bit; 78.4 % at the logged full-throttle pulls); THROTTLE_POSITION_INV likewise of its complement at bytes 5:6[7:6] (raw = 1023 - value, exact in every logged frame). Not added as separate signals because they would overlap the 8-bit ones (strict DBC parsers reject overlaps).";
+CM_ SG_ 352 TORQUE_DEMAND "HIGH CONFIDENCE (LOGS): equals 0x180 TORQUE_DEMAND.";
+CM_ SG_ 352 TORQUE_ACTUAL_2 "HIGH CONFIDENCE (LOGS): close to 0x180 TORQUE_ACTUAL (-67..+336.5 Nm) but not identical; a filtered or differently timed copy (inferred).";
+
+VAL_ 375 SHIFT_TYPE 0 "1-2" 1 "2-3" 2 "3-4" 3 "4-5" 9 "4-3" 13 "5-4" 15 "NONE" ;
+BA_ "GenMsgCycleTime" BO_ 352 10;
+BA_ "GenMsgCycleTime" BO_ 384 10;
+BA_ "GenMsgCycleTime" BO_ 505 10;
+BA_ "GenMsgCycleTime" BO_ 386 10;
+BA_ "GenMsgCycleTime" BO_ 372 10;
+BA_ "GenMsgCycleTime" BO_ 374 10;
+BA_ "GenMsgCycleTime" BO_ 375 10;
+BA_ "GenMsgCycleTime" BO_ 640 20;
+BA_ "GenMsgCycleTime" BO_ 644 20;
+BA_ "GenMsgCycleTime" BO_ 645 20;
+BA_ "GenMsgCycleTime" BO_ 852 40;
+BA_ "GenMsgCycleTime" BO_ 861 100;
+BA_ "GenMsgCycleTime" BO_ 1057 60;
+BA_ "GenMsgCycleTime" BO_ 1361 100;
+BA_ "GenMsgCycleTime" BO_ 1376 100;
+BA_ "GenMsgCycleTime" BO_ 1408 100;
